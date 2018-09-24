@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.taohan.online.exam.dao.TeacherInfoMapper">
+	
+	<resultMap type="com.taohan.online.exam.po.TeacherInfo" id="getTeacherResultMap">
+		<id column="teacherId" property="teacherId"/>
+		<result column="teacherName" property="teacherName" />
+		<result column="teacherSex" property="teacherSex" />
+		<result column="teacherAge" property="teacherAge" />
+		<result column="teacherAccount" property="teacherAccount"/>
+		<result column="teacherPwd" property="teacherPwd"/>
+		<result column="adminPower" property="adminPower"/>
+		<result column="isWork" property="isWork"/>
+		<association property="classInfo" javaType="com.taohan.online.exam.po.ClassInfo">
+			<id column="classId" property="classId"/>
+			<result column="className" property="className"/>
+		</association>
+	</resultMap>
+	
+	<parameterMap type="Map" id="teacher">
+		<parameter property="startPage" />
+		<parameter property="pageShow"/>
+	</parameterMap>
+	
+	<parameterMap type="Map" id="getTeachersParameterMap">
+		<!-- property:Map集合中的 key -->
+		<parameter property="teacherInfo"/>
+		<parameter property="startPage" />
+		<parameter property="pageShow"/>
+	</parameterMap>
+	
+	<!-- 获取教师集合 -->
+	<select id="getTeachers" parameterMap="getTeachersParameterMap"  resultMap="getTeacherResultMap">
+		SELECT a.*,b.classId,b.className FROM TeacherInfo a
+		LEFT JOIN ClassInfo b ON a.teacherId=b.teacherId
+		<where>
+			<if test="teacherInfo != null">
+				AND isWork=#{teacherInfo.isWork}
+			</if>
+		</where>
+		<if test="startPage != null and pageShow != null">
+			LIMIT #{startPage}, #{pageShow}
+		</if>
+	</select>
+	
+	<select id="getTest" parameterMap="teacher" resultMap="getTeacherResultMap">
+		SELECT a.*,b.classId,b.className FROM TeacherInfo a
+		LEFT JOIN ClassInfo b ON a.teacherId=b.teacherId
+		LIMIT #{startPage}, #{pageShow}
+	</select>
+</mapper>

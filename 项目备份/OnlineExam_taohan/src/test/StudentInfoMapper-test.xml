@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.taohan.online.exam.dao.StudentInfoMapper">
+	
+	<resultMap type="com.taohan.online.exam.po.StudentInfo" id="queryStudent">
+		<id column="studentId" property="studentId"/>
+		<result column="studentName" property="studentName"/>
+		<result column="studentAccount" property="studentAccount"/>
+		<result column="studentPwd" property="studentPwd"/>
+		<!-- 班级 -->
+		<association property="classInfo" javaType="com.taohan.online.exam.po.ClassInfo">
+			<id column="classId" property="classId"/>
+			<result column="className" property="className"/>
+		</association>
+		<!-- 年级 -->
+		<association property="grade" javaType="com.taohan.online.exam.po.GradeInfo">
+			<id column="gradeId" property="gradeId"/>
+			<result column="gradeName" property="gradeName"/>
+		</association>
+	</resultMap>
+	
+	<parameterMap type="java.util.Map" id="getStudentParameterMap">
+		<parameter property="student" resultMap="queryStudent"/>
+		<parameter property="startIndex" resultMap="queryStudent"/>
+		<parameter property="pageShow" resultMap="queryStudent"/>
+	</parameterMap>
+	
+	<!-- 获取学生集合 -->
+	<select id="getStudents" parameterMap="getStudentParameterMap" resultMap="queryStudent">
+		SELECT a.*,b.className, c.gradeId, c.gradeName FROM StudentInfo a
+		INNER JOIN ClassInfo b ON a.classId=b.classId
+		INNER JOIN GradeInfo c ON b.gradeId=c.gradeId
+		<where>
+			<!-- 
+				此处进行查询时，必须传入一个 studnet 对象，而不能传入 null,
+				否则在下面两个判断 会出现 空异常
+			 -->
+			<if test="student.studentId != null">
+				studentId=#{student.studentId}
+			</if>
+			<if test="student.classInfo != null">
+				<if test="student.classInfo.classId != null">
+					b.classId=#{student.classInfo.classId}
+				</if>
+			</if>
+			<if test="student.grade != null">
+				<if test="student.grade.gradeId != null">
+					c.gradeId=#{student.grade.gradeId}
+				</if>
+			</if>
+		</where>
+		<if test="startIndex != null and pageShow != null">
+			LIMIT #{startIndex}, #{pageShow}
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.taohan.online.exam.dao.ExamSubjectMiddleInfoMapper">
+	
+	<!-- 插入数据 -->
+	<!-- 
+		进行批量添加
+		SQL 格式：
+			INSERT INTO ExamSubjectMiddleInfo VALUES
+			(NULL, ?, ?) , (NULL, ?, ?) , (NULL, ?, ?) , (NULL, ?, ?);
+	 -->
+	<insert id="isAddESM" parameterType="java.util.Map">
+		INSERT INTO ExamSubjectMiddleInfo VALUES
+		<if test="examPaperId != null">
+			<if test="subjectIds != null">
+				<foreach collection="subjectIds" item="subjectId" close=";" separator=",">
+					(NULL, #{examPaperId}, #{subjectId})
+				</foreach>
+			</if>
+		</if>
+	</insert>
+</mapper>
